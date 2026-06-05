@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Google Drive — Clase 1 · Modernización de la Gestión Administrativa</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        cream: { 50:'#FFFDF9', 100:'#FDF8F0', 200:'#F7F2E8', 300:'#EDE5D8' },
+        wine:  { 50:'#FDF2F4', 100:'#F5D0D8', 200:'#E8A1B0', 300:'#C96B7E',
+                 400:'#A94360', 500:'#7A2D47', 600:'#602537', 700:'#4A1D2B' },
+        warm:  { 50:'#FAF8F5', 100:'#F3EDE5', 200:'#E8DFD2', 300:'#D4C7B5',
+                 400:'#B5A48D', 500:'#8C7B66', 600:'#6B5D4D', 700:'#4A3F34',
+                 800:'#2E2820', 900:'#1A1714' }
+      },
+      fontFamily: {
+        serif: ['Playfair Display','Georgia','serif'],
+        sans:  ['Inter','system-ui','sans-serif'],
+        mono:  ['JetBrains Mono','monospace']
+      }
+    }
+  }
+}
+</script>
+<style>
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,sans-serif;background:#FFFDF9;color:#2E2820}
+  .font-serif{font-family:'Playfair Display',Georgia,serif}
+  .warm-image{filter:saturate(0.9) brightness(1.02)}
+  /* nav underline animado */
+  .navlink{position:relative}
+  .navlink::after{content:"";position:absolute;left:0;bottom:-3px;height:2px;width:0;background:#602537;transition:width .3s}
+  .navlink:hover::after{width:100%}
+  /* cards lift */
+  .card-lift{transition:transform .35s ease, box-shadow .35s ease}
+  .card-lift:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(74,29,43,.16)}
+  /* animaciones de entrada */
+  .observe-animate{opacity:0;transform:translateY(28px);transition:opacity .7s ease, transform .7s ease}
+  .observe-animate.observed{opacity:1;transform:none}
+  /* progress bar */
+  #progress{position:fixed;top:0;left:0;height:3px;width:0;background:#602537;z-index:60;transition:width .1s}
+  /* scroll indicator */
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(10px)}}
+  .scroll-ind{animation:floaty 2s ease-in-out infinite}
+  @keyframes pulse-badge{0%,100%{opacity:1}50%{opacity:.55}}
+  .badge-pulse{animation:pulse-badge 2.4s ease-in-out infinite}
+  pre{font-family:'JetBrains Mono',monospace}
+  .mobile-menu{max-height:0;overflow:hidden;transition:max-height .35s ease}
+  .mobile-menu.open{max-height:340px}
+</style>
+</head>
+<body class="bg-cream-50 text-warm-800">
+<div id="progress"></div>
+
+<!-- ================= NAV ================= -->
+<nav class="fixed top-0 inset-x-0 z-50 bg-cream-50/90 backdrop-blur-xl border-b border-warm-200/70">
+  <div class="max-w-6xl mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+    <a href="#hero" class="flex items-center gap-2.5">
+      <span class="w-8 h-8 rounded-lg bg-wine-600 text-cream-50 grid place-items-center font-serif font-bold">D</span>
+      <span class="font-serif text-warm-900 font-semibold leading-tight text-sm sm:text-base">Gestión Administrativa<span class="hidden sm:inline text-warm-500 font-sans font-normal"> · Clase 1</span></span>
+    </a>
+    <div class="hidden md:flex items-center gap-7 text-sm text-warm-700">
+      <a href="#s01" class="navlink">Estructura</a>
+      <a href="#s02" class="navlink">Acciones rápidas</a>
+      <a href="#s03" class="navlink">Tips</a>
+      <a href="#chrome" class="navlink">Búsqueda</a>
+      <a href="#s05" class="navlink">Cierre</a>
+    </div>
+    <button id="hamb" class="md:hidden w-10 h-10 grid place-items-center text-warm-800" aria-label="Menú">
+      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <div id="mobileMenu" class="mobile-menu md:hidden bg-cream-50 border-t border-warm-200/70">
+    <div class="px-6 py-3 flex flex-col gap-3 text-warm-700">
+      <a href="#s01" class="py-1">01 · Estructura de carpetas</a>
+      <a href="#s02" class="py-1">02 · Acciones rápidas</a>
+      <a href="#s03" class="py-1">03 · Tips de organización</a>
+      <a href="#chrome" class="py-1">04 · Búsqueda inteligente</a>
+      <a href="#s05" class="py-1">05 · Conclusiones</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<header id="hero" class="relative min-h-screen flex items-center justify-center text-center overflow-hidden">
+  <img src="https://images.unsplash.com/photo-1497032628192-86f99bcd76bc?auto=format&fit=crop&w=2100&q=80" alt="" class="absolute inset-0 w-full h-full object-cover warm-image">
+  <div class="absolute inset-0 bg-gradient-to-b from-warm-900/95 via-warm-900/80 to-warm-900/95"></div>
+  <div class="relative z-10 px-6 max-w-3xl">
+    <span class="badge-pulse inline-flex items-center gap-2 text-cream-100 text-xs font-semibold uppercase tracking-[0.2em] border border-cream-100/40 rounded-full px-4 py-1.5 mb-7">
+      <span class="w-2 h-2 rounded-full bg-wine-200"></span> Clase Interactiva
+    </span>
+    <p class="text-wine-200 font-sans text-xs sm:text-sm uppercase tracking-[0.22em] mb-5">Modernización de la Gestión Administrativa · Dirección de Posgrado — Facultad de Derecho</p>
+    <h1 class="font-serif text-cream-50 text-4xl sm:text-6xl font-bold leading-tight">Google Drive</h1>
+    <p class="font-serif italic text-cream-100/90 text-xl sm:text-2xl mt-3">el centro de operaciones de la información digital</p>
+    <p class="text-cream-100/80 text-base sm:text-lg mt-6 max-w-xl mx-auto font-light">Dejá de buscar archivos perdidos entre correos, pendrives y carpetas dispersas. Aprendé a convertir Drive en un sistema de organización que tu oficina pueda sostener.</p>
+    <a href="#s01" class="inline-block mt-9 bg-wine-600 hover:bg-wine-500 text-cream-50 font-medium px-8 py-3.5 rounded-full transition-colors shadow-lg">Comenzar</a>
+  </div>
+  <a href="#s01" class="scroll-ind absolute bottom-8 left-1/2 -translate-x-1/2 z-10 text-cream-100/70" aria-label="Bajar">
+    <svg width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 6v18M8 17l7 7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+</header>
+
+<main class="max-w-5xl mx-auto px-5 sm:px-8">
+
+  <!-- ============ INTRO + ÍNDICE ============ -->
+  <section class="py-16 sm:py-24 observe-animate">
+    <p class="text-warm-700 text-lg leading-relaxed max-w-3xl">
+      Google Drive es mucho más que un servicio de almacenamiento en la nube. Puede entenderse como el <strong class="text-warm-900">centro de operaciones</strong> donde se organiza, conserva, comparte y gestiona la información de una organización: documentos, planillas, presentaciones, formularios, imágenes y videos que forman parte del trabajo cotidiano.
+    </p>
+    <p class="text-warm-700 text-lg leading-relaxed max-w-3xl mt-5">
+      Su valor para una oficina administrativa está en que la información deja de estar dispersa para concentrarse en un <strong class="text-warm-900">único entorno accesible</strong> desde cualquier dispositivo, permite <strong class="text-warm-900">trabajo colaborativo en tiempo real</strong> y reduce los errores por versiones múltiples. Pero su verdadero potencial surge cuando lo concebimos como un <em>sistema de organización</em>, no como un simple depósito de archivos.
+    </p>
+
+    <!-- Índice -->
+    <div class="mt-12 bg-cream-100 border border-warm-200 rounded-3xl p-7 sm:p-9 shadow-sm">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="text-wine-600 text-xs font-semibold uppercase tracking-[0.15em]">Índice</span>
+        <span class="h-px flex-1 bg-warm-300"></span>
+      </div>
+      <h2 class="font-serif text-2xl sm:text-3xl text-warm-900 font-semibold mb-2">Las tareas que vamos a abordar</h2>
+      <p class="text-warm-600 mb-7">Hacé clic en cualquier tarea para ir directamente a esa sección.</p>
+      <div class="grid sm:grid-cols-2 gap-3">
+        <a href="#s01" class="group flex gap-4 items-start p-4 rounded-2xl bg-cream-50 border border-warm-200 hover:border-wine-300 hover:bg-white transition-colors">
+          <span class="shrink-0 w-9 h-9 rounded-xl bg-wine-600 text-cream-50 grid place-items-center font-mono text-sm">01</span>
+          <span><span class="block font-semibold text-warm-900">Estructura de carpetas</span><span class="block text-sm text-warm-600">Profundidad, numeración y categorías</span></span>
+        </a>
+        <a href="#s02" class="group flex gap-4 items-start p-4 rounded-2xl bg-cream-50 border border-warm-200 hover:border-wine-300 hover:bg-white transition-colors">
+          <span class="shrink-0 w-9 h-9 rounded-xl bg-wine-600 text-cream-50 grid place-items-center font-mono text-sm">02</span>
+          <span><span class="block font-semibold text-warm-900">Organización visual y acciones rápidas</span><span class="block text-sm text-warm-600">Colores, mover carpetas y atajos</span></span>
+        </a>
+        <a href="#tip1" class="group flex gap-4 items-start p-4 rounded-2xl bg-cream-50 border border-warm-200 hover:border-wine-300 hover:bg-white transition-colors">
+          <span class="shrink-0 w-9 h-9 rounded-xl bg-warm-700 text-cream-50 grid place-items-center font-mono text-sm">T1</span>
+          <span><span class="block font-semibold text-warm-900">Tip #1 — Organizar según contexto</span><span class="block text-sm text-warm-600">Guardar archivos donde se usan</span></span>
+        </a>
+        <a href="#tip2" class="group flex gap-4 items-start p-4 rounded-2xl bg-cream-50 border border-warm-200 hover:border-wine-300 hover:bg-white transition-colors">
+          <span class="shrink-0 w-9 h-9 rounded-xl bg-warm-700 text-cream-50 grid place-items-center font-mono text-sm">T2</span>
+          <span><span class="block font-semibold text-warm-900">Tip #2 — Limitar destacados</span><span class="block text-sm text-warm-600">Favoritos solo para lo crítico</span></span>
+        </a>
+        <a href="#tip3" class="group flex gap-4 items-start p-4 rounded-2xl bg-cream-50 border border-warm-200 hover:border-wine-300 hover:bg-white transition-colors">
+          <span class="shrink-0 w-9 h-9 rounded-xl bg-warm-700 text-cream-50 grid place-items-center font-mono text-sm">T3</span>
+          <span><span class="block font-semibold text-warm-900">Tip #3 — Shortcuts vs copias</span><span class="block text-sm text-warm-600">Cuándo usar cada uno</span></span>
+        </a>
+        <a href="#nombres" class="group flex gap-4 items-start p-4 rounded-2xl bg-cream-50 border border-warm-200 hover:border-wine-300 hover:bg-white transition-colors">
+          <span class="shrink-0 w-9 h-9 rounded-xl bg-wine-600 text-cream-50 grid place-items-center font-mono text-sm">03</span>
+          <span><span class="block font-semibold text-warm-900">Convenciones para nombrar archivos</span><span class="block text-sm text-warm-600">Palabras clave y consistencia</span></span>
+        </a>
+        <a href="#chrome" class="group flex gap-4 items-start p-4 rounded-2xl bg-cream-50 border border-warm-200 hover:border-wine-300 hover:bg-white transition-colors">
+          <span class="shrink-0 w-9 h-9 rounded-xl bg-wine-600 text-cream-50 grid place-items-center font-mono text-sm">04</span>
+          <span><span class="block font-semibold text-warm-900">Búsqueda inteligente desde Chrome</span><span class="block text-sm text-warm-600">Buscar en Drive desde el navegador</span></span>
+        </a>
+        <a href="#avanzada" class="group flex gap-4 items-start p-4 rounded-2xl bg-cream-50 border border-warm-200 hover:border-wine-300 hover:bg-white transition-colors">
+          <span class="shrink-0 w-9 h-9 rounded-xl bg-wine-600 text-cream-50 grid place-items-center font-mono text-sm">05</span>
+          <span><span class="block font-semibold text-warm-900">Búsqueda avanzada en Drive</span><span class="block text-sm text-warm-600">Filtros por tipo, propietario y contenido</span></span>
+        </a>
+        <a href="#s05" class="group flex gap-4 items-start p-4 rounded-2xl bg-cream-50 border border-warm-200 hover:border-wine-300 hover:bg-white transition-colors sm:col-span-2">
+          <span class="shrink-0 w-9 h-9 rounded-xl bg-warm-900 text-cream-50 grid place-items-center font-mono text-sm">06</span>
+          <span><span class="block font-semibold text-warm-900">Conclusiones finales</span><span class="block text-sm text-warm-600">Simplicidad y consistencia por encima del sistema perfecto</span></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECCIÓN 01 ============ -->
+  <section id="s01" class="py-14 border-t border-warm-200 observe-animate scroll-mt-20">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="text-wine-600 text-xs font-semibold uppercase tracking-[0.15em]">Sección 01</span>
+      <span class="h-px w-16 bg-warm-300"></span>
+    </div>
+    <h2 class="font-serif text-3xl sm:text-4xl text-warm-900 font-semibold">🗂️ Estructura de carpetas</h2>
+    <p class="text-warm-600 mt-2 text-lg">Profundidad, numeración y categorías.</p>
+
+    <div class="mt-7 bg-warm-100 border-l-4 border-warm-300 rounded-r-2xl p-5">
+      <span class="block text-xs font-semibold uppercase tracking-wide text-warm-700 mb-1">💡 Idea principal</span>
+      <p class="text-warm-800">Una jerarquía limitada y numerada facilita la navegación, el mantenimiento del sistema y la búsqueda rápida de archivos.</p>
+    </div>
+
+    <h3 class="font-serif text-2xl text-warm-900 mt-10 mb-3">📏 Regla principal: limitar la profundidad</h3>
+    <p class="text-warm-700">Se recomienda un máximo de <strong class="text-warm-900">5 niveles de carpetas</strong>. El sexto nivel debería contener únicamente archivos.</p>
+
+    <div class="mt-6 bg-warm-900 rounded-2xl p-6 overflow-x-auto">
+      <svg viewBox="0 0 620 120" xmlns="http://www.w3.org/2000/svg" class="min-w-[560px] w-full">
+        <g font-family="Inter,sans-serif" font-weight="700" font-size="11" fill="#FFFDF9">
+          <rect x="10" y="40" width="80" height="46" rx="8" fill="#7A2D47"/><text x="50" y="67" text-anchor="middle">Nivel 1</text>
+          <rect x="110" y="40" width="80" height="46" rx="8" fill="#8a3550"/><text x="150" y="67" text-anchor="middle">Nivel 2</text>
+          <rect x="210" y="40" width="80" height="46" rx="8" fill="#A94360"/><text x="250" y="67" text-anchor="middle">Nivel 3</text>
+          <rect x="310" y="40" width="80" height="46" rx="8" fill="#bd5470"/><text x="350" y="67" text-anchor="middle">Nivel 4</text>
+          <rect x="410" y="40" width="80" height="46" rx="8" fill="#C96B7E"/><text x="450" y="67" text-anchor="middle">Nivel 5</text>
+          <rect x="510" y="40" width="95" height="46" rx="8" fill="#6B5D4D"/><text x="557" y="62" text-anchor="middle">Nivel 6</text><text x="557" y="76" text-anchor="middle" font-size="9" font-weight="400">solo archivos</text>
+          <path d="M90 63 h20 M190 63 h20 M290 63 h20 M390 63 h20 M490 63 h20" stroke="#B5A48D" stroke-width="2"/>
+          <text x="307" y="22" text-anchor="middle" font-size="12" fill="#F3EDE5">📐 Máximo recomendado de profundidad</text>
+        </g>
+      </svg>
+    </div>
+
+    <h4 class="font-semibold text-warm-900 mt-8 mb-2">¿Por qué?</h4>
+    <p class="text-warm-700">Cuando existen demasiados niveles nos desorientamos, aumenta el tiempo para encontrar documentos, se incrementa la carga cognitiva y resulta más difícil mantener el sistema ordenado.</p>
+
+    <h3 class="font-serif text-2xl text-warm-900 mt-10 mb-3">🔢 Sistema de numeración</h3>
+    <p class="text-warm-700">Cada nivel puede contener carpetas numeradas. Ejemplo:</p>
+    <pre class="mt-3 bg-warm-900 text-warm-100 rounded-2xl p-5 border-l-4 border-wine-600 text-sm whitespace-pre-wrap">01
+02
+03
+...</pre>
+
+    <div class="mt-6 bg-amber-50 border border-amber-200 rounded-2xl p-5">
+      <span class="block text-xs font-semibold uppercase tracking-wide text-amber-700 mb-1">⚠️ Regla importante</span>
+      <p class="text-warm-800">Las carpetas más utilizadas deben ocupar los <strong>números más bajos</strong>: así aparecen primero, son más fáciles de localizar y el sistema se vuelve más intuitivo.</p>
+    </div>
+
+    <h3 class="font-serif text-2xl text-warm-900 mt-10 mb-3">🗃️ Estructura sugerida de nivel principal</h3>
+    <pre class="bg-warm-900 text-warm-100 rounded-2xl p-5 border-l-4 border-wine-600 text-sm whitespace-pre-wrap">01 Cursos / Maestría en IA
+02 Normativas / Reglamento o "Compartidos"
+03 Áreas / -licencias
+04 Archivo</pre>
+    <pre class="mt-3 bg-warm-900 text-warm-100 rounded-2xl p-5 border-l-4 border-wine-600 text-sm whitespace-pre-wrap">Unidad de Darío</pre>
+
+    <figure class="mt-7">
+      <img src="img/01-mi-unidad.png" alt="Vista de Mi unidad en Google Drive con carpetas Archivos, Áreas, Intereses y Proyectos" class="rounded-2xl border border-warm-200 shadow-md warm-image w-full">
+      <figcaption class="text-sm text-warm-500 italic mt-2">Ejemplo real de "Mi unidad": carpetas de nivel principal claramente diferenciadas.</figcaption>
+    </figure>
+
+    <div class="mt-7 bg-blue-50 border border-blue-200 rounded-2xl p-5">
+      <span class="block text-xs font-semibold uppercase tracking-wide text-blue-700 mb-1">ℹ️ Carpeta "Archivo"</span>
+      <p class="text-warm-800">Destinada a archivos inactivos, documentación antigua y material que probablemente no vuelva a utilizarse, pero que no queremos eliminar.</p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 gap-4 mt-8">
+      <div class="card-lift bg-cream-100 border border-warm-200 rounded-2xl p-6">
+        <h4 class="font-serif text-xl text-warm-900 mb-3">✅ Aplicaciones inmediatas</h4>
+        <ul class="space-y-1.5 text-warm-700 text-sm list-disc list-inside">
+          <li>Limitar la profundidad de carpetas.</li>
+          <li>Crear una carpeta universal de Archivo.</li>
+          <li>Incorporar una carpeta temporal de compartidos.</li>
+          <li>Numerar carpetas según prioridad y frecuencia de uso.</li>
+          <li>Mantener estructuras simples y previsibles.</li>
+        </ul>
+      </div>
+      <div class="card-lift bg-cream-100 border border-warm-200 rounded-2xl p-6">
+        <h4 class="font-serif text-xl text-warm-900 mb-3">🚀 Beneficios</h4>
+        <ul class="space-y-1.5 text-warm-700 text-sm list-disc list-inside">
+          <li>Reduce el tiempo de búsqueda.</li>
+          <li>Facilita el mantenimiento.</li>
+          <li>Mejora la orientación dentro de Drive.</li>
+          <li>Permite escalar sin perder claridad.</li>
+          <li>Hace más intuitivo el trabajo colaborativo.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECCIÓN 02 ============ -->
+  <section id="s02" class="py-14 border-t border-warm-200 observe-animate scroll-mt-20">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="text-wine-600 text-xs font-semibold uppercase tracking-[0.15em]">Sección 02</span>
+      <span class="h-px w-16 bg-warm-300"></span>
+    </div>
+    <h2 class="font-serif text-3xl sm:text-4xl text-warm-900 font-semibold">🎨 Organización visual y acciones rápidas</h2>
+    <p class="text-warm-600 mt-2 text-lg">Google Drive permite organizar carpetas de manera visual y rápida desde el menú contextual.</p>
+
+    <h3 class="font-serif text-2xl text-warm-900 mt-9 mb-3">🖱️ Cómo acceder</h3>
+    <p class="text-warm-700">Hacé <strong>clic derecho</strong> sobre una carpeta y seleccioná la opción <strong>Organizar</strong>. Desde allí se realizan distintas acciones.</p>
+
+    <figure class="mt-7">
+      <img src="img/02-menu-organizar.png" alt="Menú contextual de Google Drive: Organizar, colores de carpeta, Mover, Cambiar nombre" class="rounded-2xl border border-warm-200 shadow-md warm-image w-full">
+      <figcaption class="text-sm text-warm-500 italic mt-2">Menú "Organizar": colores de carpeta, mover, acceso directo, destacados y cambiar nombre (Ctrl+Alt+E).</figcaption>
+    </figure>
+
+    <h3 class="font-serif text-2xl text-warm-900 mt-10 mb-3">🎨 Cambiar color de carpetas</h3>
+    <p class="text-warm-700">Dentro de "Organizar" se puede cambiar el color de una carpeta, diferenciar visualmente áreas de trabajo e identificar proyectos importantes más rápido.</p>
+    <div class="flex flex-wrap gap-6 justify-center mt-6">
+      <div class="text-center text-sm font-medium text-warm-700"><svg width="52" height="42" viewBox="0 0 46 38" class="mx-auto"><path d="M2 6a4 4 0 014-4h12l5 5h17a4 4 0 014 4v23a4 4 0 01-4 4H6a4 4 0 01-4-4z" fill="#C0392B"/></svg>Diplomado</div>
+      <div class="text-center text-sm font-medium text-warm-700"><svg width="52" height="42" viewBox="0 0 46 38" class="mx-auto"><path d="M2 6a4 4 0 014-4h12l5 5h17a4 4 0 014 4v23a4 4 0 01-4 4H6a4 4 0 01-4-4z" fill="#2980B9"/></svg>Doctorado en Mediación</div>
+      <div class="text-center text-sm font-medium text-warm-700"><svg width="52" height="42" viewBox="0 0 46 38" class="mx-auto"><path d="M2 6a4 4 0 014-4h12l5 5h17a4 4 0 014 4v23a4 4 0 01-4 4H6a4 4 0 01-4-4z" fill="#27AE60"/></svg>Maestría en Daños</div>
+      <div class="text-center text-sm font-medium text-warm-700"><svg width="52" height="42" viewBox="0 0 46 38" class="mx-auto"><path d="M2 6a4 4 0 014-4h12l5 5h17a4 4 0 014 4v23a4 4 0 01-4 4H6a4 4 0 01-4-4z" fill="#E0A800"/></svg>Esp. en D. Laboral</div>
+    </div>
+
+    <h3 class="font-serif text-2xl text-warm-900 mt-10 mb-3">📂 Mover carpetas rápidamente</h3>
+    <p class="text-warm-700 mb-4">También desde "Organizar" se puede mover una carpeta a otra ubicación.</p>
+    <ol class="space-y-3">
+      <li class="flex gap-4"><span class="shrink-0 w-8 h-8 rounded-full bg-wine-600 text-cream-50 grid place-items-center font-mono text-sm">1</span><span class="text-warm-700 pt-1">Clic derecho sobre la carpeta.</span></li>
+      <li class="flex gap-4"><span class="shrink-0 w-8 h-8 rounded-full bg-wine-600 text-cream-50 grid place-items-center font-mono text-sm">2</span><span class="text-warm-700 pt-1">Ir a <strong>Organizar</strong>.</span></li>
+      <li class="flex gap-4"><span class="shrink-0 w-8 h-8 rounded-full bg-wine-600 text-cream-50 grid place-items-center font-mono text-sm">3</span><span class="text-warm-700 pt-1">Seleccionar <strong>Mover</strong>.</span></li>
+      <li class="flex gap-4"><span class="shrink-0 w-8 h-8 rounded-full bg-wine-600 text-cream-50 grid place-items-center font-mono text-sm">4</span><span class="text-warm-700 pt-1">Drive mostrará inicialmente sugerencias.</span></li>
+      <li class="flex gap-4"><span class="shrink-0 w-8 h-8 rounded-full bg-wine-600 text-cream-50 grid place-items-center font-mono text-sm">5</span><span class="text-warm-700 pt-1">Para elegir manualmente: <strong>Todas las ubicaciones</strong> → <strong>Mi unidad</strong> → navegar al destino.</span></li>
+    </ol>
+    <p class="text-warm-700 mt-4">Esto permite reorganizar estructuras sin arrastrar carpetas manualmente.</p>
+
+    <div class="mt-8 bg-warm-100 border border-warm-200 rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-5 justify-between">
+      <div>
+        <h4 class="font-serif text-xl text-warm-900 mb-1">⌨️ Atajo para cambiar nombre</h4>
+        <p class="text-warm-700 text-sm">Renombrá un archivo o carpeta sin entrar a múltiples menús.</p>
+      </div>
+      <div class="flex items-center gap-2 text-sm font-mono">
+        <kbd class="bg-warm-900 text-cream-50 rounded-md px-3 py-1.5 border-b-2 border-black">Ctrl</kbd>
+        <span class="text-warm-500">+</span>
+        <kbd class="bg-warm-900 text-cream-50 rounded-md px-3 py-1.5 border-b-2 border-black">Alt</kbd>
+        <span class="text-warm-500">+</span>
+        <kbd class="bg-warm-900 text-cream-50 rounded-md px-3 py-1.5 border-b-2 border-black">E</kbd>
+      </div>
+    </div>
+
+    <div class="mt-7 bg-warm-100 border-l-4 border-wine-400 rounded-r-2xl p-5">
+      <span class="block text-xs font-semibold uppercase tracking-wide text-wine-600 mb-1">💡 Idea clave</span>
+      <p class="text-warm-800">La organización visual también mejora la productividad. Usar colores, mover bien las carpetas y aprovechar atajos reduce fricción y hace más intuitivo el trabajo diario.</p>
+    </div>
+  </section>
+
+  <!-- ============ TIPS ============ -->
+  <section id="s03" class="py-14 border-t border-warm-200 observe-animate scroll-mt-20">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="text-wine-600 text-xs font-semibold uppercase tracking-[0.15em]">Tips de organización</span>
+      <span class="h-px w-16 bg-warm-300"></span>
+    </div>
+    <h2 class="font-serif text-3xl sm:text-4xl text-warm-900 font-semibold">Tres decisiones que ordenan tu Drive</h2>
+
+    <!-- TIP 1 -->
+    <article id="tip1" class="mt-9 scroll-mt-20">
+      <h3 class="font-serif text-2xl text-warm-900 mb-2">🧭 Tip #1 — Organizar según el contexto de uso</h3>
+      <div class="bg-warm-100 border-l-4 border-warm-300 rounded-r-2xl p-5 mb-4">
+        <span class="block text-xs font-semibold uppercase tracking-wide text-warm-700 mb-1">💡 Idea principal</span>
+        <p class="text-warm-800">Los archivos deben guardarse en el lugar donde realmente se utilizan. La organización eficiente nace del contexto práctico, no de clasificar de forma abstracta.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="bg-red-50 border border-red-200 rounded-2xl p-6">
+          <span class="block text-xs font-semibold uppercase tracking-wide text-red-700 mb-2">❌ Enfoque poco eficiente</span>
+          <pre class="bg-warm-900 text-warm-100 rounded-xl p-4 text-sm whitespace-pre-wrap mb-3">Notas de reuniones
+Documentos
+PDF
+Presentaciones
+Formularios</pre>
+          <p class="text-warm-700 text-sm">Obliga a navegar entre carpetas, separa información relacionada, rompe el contexto y dificulta compartir proyectos completos.</p>
+        </div>
+        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6">
+          <span class="block text-xs font-semibold uppercase tracking-wide text-emerald-700 mb-2">✅ Enfoque recomendado</span>
+          <pre class="bg-warm-900 text-warm-100 rounded-xl p-4 text-sm whitespace-pre-wrap mb-3">Doctorado
+ └── Inscriptos
+ └── Docentes
+ └── Clases</pre>
+          <p class="text-warm-700 text-sm">Cada proyecto contiene toda su información, el contexto permanece unido y compartir carpetas completas es mucho más simple.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- TIP 2 -->
+    <article id="tip2" class="mt-12 scroll-mt-20">
+      <h3 class="font-serif text-2xl text-warm-900 mb-2">⭐ Tip #2 — Limitar la cantidad de archivos destacados</h3>
+      <div class="bg-warm-100 border-l-4 border-warm-300 rounded-r-2xl p-5 mb-4">
+        <span class="block text-xs font-semibold uppercase tracking-wide text-warm-700 mb-1">💡 Idea principal</span>
+        <p class="text-warm-800">La función de destacados ("Starred" / "Favoritos") debe reservarse únicamente para documentos realmente críticos, sobre todo para acceder desde el celular.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="card-lift bg-cream-100 border border-warm-200 rounded-2xl p-6">
+          <h4 class="font-semibold text-warm-900 mb-2">📌 Criterios para destacar</h4>
+          <ul class="space-y-1.5 text-warm-700 text-sm list-disc list-inside">
+            <li>Tiene uso diario.</li>
+            <li>Requiere acceso rápido y frecuente.</li>
+            <li>Necesita estar disponible desde el celular.</li>
+            <li>Es clave para el trabajo actual.</li>
+          </ul>
+        </div>
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+          <span class="block text-xs font-semibold uppercase tracking-wide text-amber-700 mb-2">⚠️ Regla importante</span>
+          <p class="text-warm-800 mb-2">Mantené un máximo aproximado de <strong>5 archivos o carpetas destacadas</strong>.</p>
+          <p class="text-warm-700 text-sm">Cuando demasiados elementos son favoritos, el sistema pierde utilidad.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- TIP 3 -->
+    <article id="tip3" class="mt-12 scroll-mt-20">
+      <h3 class="font-serif text-2xl text-warm-900 mb-2">🔗 Tip #3 — Cuándo usar shortcuts vs copias</h3>
+      <div class="bg-warm-100 border-l-4 border-warm-300 rounded-r-2xl p-5 mb-4">
+        <span class="block text-xs font-semibold uppercase tracking-wide text-warm-700 mb-1">💡 Idea principal</span>
+        <p class="text-warm-800">Un error frecuente es crear copias innecesarias de documentos compartidos, cuando convendría usar accesos directos ("shortcuts"). Ante un archivo compartido: no hacer nada, crear una copia, o crear un shortcut.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-4">
+        <div class="bg-red-50 border border-red-200 rounded-2xl p-6">
+          <span class="block text-xs font-semibold uppercase tracking-wide text-red-700 mb-2">📄 La copia</span>
+          <p class="text-warm-700 text-sm mb-2">Útil como template, modelo, referencia estática o base para un archivo nuevo.</p>
+          <p class="text-warm-800 text-sm"><strong>Problema:</strong> deja de sincronizarse con el original, no recibe actualizaciones y genera versiones desactualizadas.</p>
+        </div>
+        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-6">
+          <span class="block text-xs font-semibold uppercase tracking-wide text-emerald-700 mb-2">🔗 El shortcut</span>
+          <p class="text-warm-700 text-sm mb-2">Ideal para documentos vivos, archivos colaborativos y material que se actualiza constantemente.</p>
+          <p class="text-warm-800 text-sm">Incorpora el archivo a tu estructura <strong>sin mover el original</strong> y conserva una única fuente de verdad.</p>
+        </div>
+      </div>
+
+      <div class="mt-5 bg-warm-900 rounded-2xl p-6 overflow-x-auto">
+        <svg viewBox="0 0 560 150" xmlns="http://www.w3.org/2000/svg" class="min-w-[520px] w-full">
+          <g font-family="Inter,sans-serif" font-size="12">
+            <rect x="210" y="55" width="140" height="46" rx="10" fill="#7A2D47"/><text x="280" y="75" text-anchor="middle" fill="#FFFDF9" font-weight="700">📄 Archivo</text><text x="280" y="91" text-anchor="middle" fill="#F5D0D8" font-size="10">única fuente de verdad</text>
+            <rect x="20" y="20" width="120" height="38" rx="9" fill="#2E2820" stroke="#C96B7E"/><text x="80" y="44" text-anchor="middle" fill="#F3EDE5">🔗 Tu carpeta</text>
+            <rect x="20" y="98" width="120" height="38" rx="9" fill="#2E2820" stroke="#C96B7E"/><text x="80" y="122" text-anchor="middle" fill="#F3EDE5">🔗 Equipo</text>
+            <rect x="420" y="20" width="120" height="38" rx="9" fill="#2E2820" stroke="#C96B7E"/><text x="480" y="44" text-anchor="middle" fill="#F3EDE5">🔗 Manager</text>
+            <path d="M140 39 C180 50 180 65 210 72 M140 117 C180 105 180 90 210 82 M420 39 C380 50 380 65 350 72" stroke="#C96B7E" stroke-width="2" fill="none" stroke-dasharray="5 4"/>
+          </g>
+        </svg>
+      </div>
+
+      <div class="grid sm:grid-cols-2 gap-3 mt-5">
+        <blockquote class="font-serif italic text-warm-900 bg-cream-100 border border-dashed border-wine-300 rounded-2xl p-4">"Tu manager lo organiza a su manera; vos, a la tuya."</blockquote>
+        <blockquote class="font-serif italic text-warm-900 bg-cream-100 border border-dashed border-wine-300 rounded-2xl p-4">"El shortcut evita duplicación innecesaria."</blockquote>
+      </div>
+
+      <div class="mt-5 bg-warm-100 border-l-4 border-wine-400 rounded-r-2xl p-5">
+        <span class="block text-xs font-semibold uppercase tracking-wide text-wine-600 mb-1">📌 Idea clave</span>
+        <p class="text-warm-800">En sistemas colaborativos la prioridad no es tener el archivo "guardado" muchas veces, sino mantener sincronización, evitar versiones conflictivas y trabajar sobre una única fuente confiable.</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- ============ NOMBRES (03) ============ -->
+  <section id="nombres" class="py-14 border-t border-warm-200 observe-animate scroll-mt-20">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="text-wine-600 text-xs font-semibold uppercase tracking-[0.15em]">Sección 03</span>
+      <span class="h-px w-16 bg-warm-300"></span>
+    </div>
+    <h2 class="font-serif text-3xl sm:text-4xl text-warm-900 font-semibold">🏷️ Convenciones para nombrar archivos</h2>
+    <p class="text-warm-600 mt-2 text-lg">Nombres basados en palabras clave. Un buen sistema permite encontrar archivos rápido con el buscador de Drive.</p>
+
+    <div class="grid sm:grid-cols-2 gap-3 mt-7">
+      <blockquote class="font-serif italic text-warm-900 bg-cream-100 border border-dashed border-wine-300 rounded-2xl p-4">"La consistencia es más importante que el sistema."</blockquote>
+      <blockquote class="font-serif italic text-warm-900 bg-cream-100 border border-dashed border-wine-300 rounded-2xl p-4">"Si todo sigue la misma estructura, funciona."</blockquote>
+    </div>
+    <p class="text-warm-700 mt-5">No existe un sistema perfecto. Lo importante es mantener consistencia, repetir estructuras y usar siempre las mismas palabras clave.</p>
+
+    <h3 class="font-serif text-2xl text-warm-900 mt-9 mb-3">🔑 Palabras clave repetibles</h3>
+    <p class="text-warm-700 mb-3">Palabras estándar para identificar rápido el tipo de documento. Por ejemplo:</p>
+    <div class="flex flex-wrap gap-2">
+      <span class="bg-wine-600 text-cream-50 rounded-full px-4 py-1.5 text-sm font-mono">Formulario</span>
+      <span class="bg-wine-600 text-cream-50 rounded-full px-4 py-1.5 text-sm font-mono">Inscripción</span>
+      <span class="bg-wine-600 text-cream-50 rounded-full px-4 py-1.5 text-sm font-mono">Cuotas</span>
+    </div>
+
+    <h3 class="font-serif text-2xl text-warm-900 mt-9 mb-3">🧩 Estructura sugerida</h3>
+    <p class="text-warm-700 mb-3">Combiná <strong>nombre del curso</strong> + <strong>contenido</strong> + <strong>fecha</strong>:</p>
+    <pre class="bg-warm-900 text-warm-100 rounded-2xl p-5 border-l-4 border-wine-600 text-sm whitespace-pre-wrap">Doctorado_inscriptos_2026
+
+CursoIA_asistencia_03-04-2026</pre>
+
+    <div class="mt-6 bg-red-50 border border-red-200 rounded-2xl p-5">
+      <span class="block text-xs font-semibold uppercase tracking-wide text-red-700 mb-1">❌ Evitar nombres ambiguos</span>
+      <p class="text-warm-800">Generan confusión, dificultan búsquedas y producen errores de versión.</p>
+    </div>
+
+    <div class="grid sm:grid-cols-2 gap-4 mt-8">
+      <div class="card-lift bg-cream-100 border border-warm-200 rounded-2xl p-6">
+        <h4 class="font-serif text-xl text-warm-900 mb-3">✅ Aplicaciones inmediatas</h4>
+        <ul class="space-y-1.5 text-warm-700 text-sm list-disc list-inside">
+          <li>Definir entre 5 y 10 palabras clave estándar.</li>
+          <li>Estandarizar el formato de fechas.</li>
+          <li>Usar siempre la misma estructura.</li>
+          <li>Evitar nombres ambiguos o imprecisos.</li>
+          <li>Mantener criterios uniformes en el equipo.</li>
+        </ul>
+      </div>
+      <div class="card-lift bg-cream-100 border border-warm-200 rounded-2xl p-6">
+        <h4 class="font-serif text-xl text-warm-900 mb-3">🚀 Beneficios</h4>
+        <ul class="space-y-1.5 text-warm-700 text-sm list-disc list-inside">
+          <li>Archivos más fáciles de encontrar.</li>
+          <li>Mejor organización colectiva.</li>
+          <li>Menor pérdida de tiempo.</li>
+          <li>Menos errores de versión.</li>
+          <li>Búsquedas mucho más eficientes.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BÚSQUEDA (04) ============ -->
+  <section id="chrome" class="py-14 border-t border-warm-200 observe-animate scroll-mt-20">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="text-wine-600 text-xs font-semibold uppercase tracking-[0.15em]">Sección 04</span>
+      <span class="h-px w-16 bg-warm-300"></span>
+    </div>
+    <h2 class="font-serif text-3xl sm:text-4xl text-warm-900 font-semibold">🔎 Búsqueda inteligente desde Chrome</h2>
+    <p class="text-warm-600 mt-2 text-lg">Configurá Chrome para buscar en Drive directamente desde la barra del navegador, sin entrar manualmente a Drive.</p>
+
+    <h3 class="font-serif text-2xl text-warm-900 mt-9 mb-4">⚙️ Configuración paso a paso</h3>
+    <ol class="space-y-3">
+      <li class="flex gap-4"><span class="shrink-0 w-8 h-8 rounded-full bg-wine-600 text-cream-50 grid place-items-center font-mono text-sm">1</span><span class="text-warm-700 pt-1">Abrir Google Chrome.</span></li>
+      <li class="flex gap-4"><span class="shrink-0 w-8 h-8 rounded-full bg-wine-600 text-cream-50 grid place-items-center font-mono text-sm">2</span><span class="text-warm-700 pt-1">Ir a <strong>Configuración</strong>.</span></li>
+      <li class="flex gap-4"><span class="shrink-0 w-8 h-8 rounded-full bg-wine-600 text-cream-50 grid place-items-center font-mono text-sm">3</span><span class="text-warm-700 pt-1"><strong>Motor de búsqueda</strong> → <strong>Administrar motores de búsqueda y búsquedas en sitios</strong>.</span></li>
+      <li class="flex gap-4"><span class="shrink-0 w-8 h-8 rounded-full bg-wine-600 text-cream-50 grid place-items-center font-mono text-sm">4</span><span class="text-warm-700 pt-1">Bajar hasta la sección <strong>Búsquedas en sitios</strong>.</span></li>
+      <li class="flex gap-4"><span class="shrink-0 w-8 h-8 rounded-full bg-wine-600 text-cream-50 grid place-items-center font-mono text-sm">5</span><span class="text-warm-700 pt-1">Buscar <strong>Google Drive</strong>.</span></li>
+      <li class="flex gap-4"><span class="shrink-0 w-8 h-8 rounded-full bg-wine-600 text-cream-50 grid place-items-center font-mono text-sm">6</span><span class="text-warm-700 pt-1">Clic en <span class="font-mono bg-warm-900 text-cream-50 rounded px-2">⋮</span> y luego en <strong>Activar</strong>.</span></li>
+    </ol>
+
+    <figure class="mt-7">
+      <img src="img/03-chrome-sitios.png" alt="Sección Búsquedas en sitios de Chrome con Google Drive" class="rounded-2xl border border-warm-200 shadow-md warm-image w-full">
+      <figcaption class="text-sm text-warm-500 italic mt-2">Sección "Búsquedas en sitios" de Chrome, con Google Drive disponible como atajo.</figcaption>
+    </figure>
+
+    <div class="mt-7">
+      <span class="block text-sm font-semibold text-warm-900 mb-2">📌 Si Google Drive no aparece, agregalo manualmente con este enlace:</span>
+      <div class="bg-warm-900 rounded-2xl overflow-hidden border-l-4 border-wine-600">
+        <div class="flex items-center justify-between px-4 py-2 bg-black/20">
+          <span class="text-warm-300 text-xs font-mono">URL del motor de búsqueda</span>
+          <button class="copy-btn text-cream-100 text-xs border border-cream-100/30 rounded-md px-3 py-1 hover:bg-cream-50/10 transition" data-target="url-drive">Copiar</button>
+        </div>
+        <pre id="url-drive" class="text-warm-100 text-sm p-4 whitespace-pre-wrap">https://drive.google.com/drive/u/0/search?q=%s</pre>
+      </div>
+    </div>
+
+    <h3 class="font-serif text-2xl text-warm-900 mt-10 mb-3">🚀 Cómo usar la búsqueda</h3>
+    <p class="text-warm-700">Una vez activado: en la barra del navegador escribí <strong>Drive</strong>; Chrome mostrará <strong>Buscar en Google Drive</strong>; hacé clic, escribí el nombre del archivo y presioná <kbd class="bg-warm-900 text-cream-50 rounded-md px-2 py-0.5 font-mono text-sm border-b-2 border-black">Enter</kbd>. Se abre el buscador de Drive con el resultado, sin entrar previamente a la aplicación.</p>
+
+    <figure class="mt-7">
+      <img src="img/04-barra-chrome.png" alt="Barra de Chrome mostrando la opción Buscar Google Drive" class="rounded-2xl border border-warm-200 shadow-md warm-image w-full">
+      <figcaption class="text-sm text-warm-500 italic mt-2">Al escribir "drive", Chrome ofrece el botón "Buscar Google Drive".</figcaption>
+    </figure>
+  </section>
+
+  <!-- ============ AVANZADA ============ -->
+  <section id="avanzada" class="py-14 border-t border-warm-200 observe-animate scroll-mt-20">
+    <div class="flex items-center gap-3 mb-3">
+      <span class="text-wine-600 text-xs font-semibold uppercase tracking-[0.15em]">Sección 05</span>
+      <span class="h-px w-16 bg-warm-300"></span>
+    </div>
+    <h2 class="font-serif text-3xl sm:text-4xl text-warm-900 font-semibold">🔍 Búsqueda avanzada en Google Drive</h2>
+    <p class="text-warm-600 mt-2 text-lg">Encontrá archivos con mucha más precisión, sobre todo cuando hay muchos documentos almacenados.</p>
+
+    <p class="text-warm-700 mt-6">Para acceder: entrá a Drive, andá a la barra de búsqueda superior y hacé clic en el ícono de búsqueda avanzada (los controles deslizantes a la derecha del buscador).</p>
+
+    <figure class="mt-7">
+      <img src="img/05-busqueda-avanzada.png" alt="Cuadro de búsqueda avanzada de Google Drive con filtros" class="rounded-2xl border border-warm-200 shadow-md warm-image w-full max-w-2xl">
+      <figcaption class="text-sm text-warm-500 italic mt-2">Panel de búsqueda avanzada: tipo, propietario, palabras contenidas y nombre del elemento.</figcaption>
+    </figure>
+
+    <div class="grid md:grid-cols-3 gap-4 mt-8">
+      <div class="card-lift bg-cream-100 border border-warm-200 rounded-2xl p-6">
+        <h4 class="font-serif text-xl text-warm-900 mb-3">📄 Tipo de archivo</h4>
+        <p class="text-warm-700 text-sm">Documentos de texto, PDF, hojas de cálculo, presentaciones, formularios, imágenes, videos y carpetas.</p>
+      </div>
+      <div class="card-lift bg-cream-100 border border-warm-200 rounded-2xl p-6">
+        <h4 class="font-serif text-xl text-warm-900 mb-3">👤 Propietario</h4>
+        <p class="text-warm-700 text-sm">Soy el propietario, no soy el propietario o una persona específica. Incluso por nombre o correo del autor.</p>
+      </div>
+      <div class="card-lift bg-cream-100 border border-warm-200 rounded-2xl p-6">
+        <h4 class="font-serif text-xl text-warm-900 mb-3">📝 Contenido</h4>
+        <p class="text-warm-700 text-sm">Palabras que contiene el documento, nombre del archivo o términos específicos. Útil cuando no recordamos el nombre exacto.</p>
+      </div>
+    </div>
+
+    <div class="mt-7 bg-blue-50 border border-blue-200 rounded-2xl p-6">
+      <span class="block text-xs font-semibold uppercase tracking-wide text-blue-700 mb-2">✅ Ejemplos prácticos</span>
+      <ul class="space-y-1.5 text-warm-800 text-sm list-disc list-inside">
+        <li>Buscar todos los PDFs enviados por una persona determinada.</li>
+        <li>Encontrar una hoja de cálculo que contenga la palabra "inscriptos".</li>
+        <li>Localizar presentaciones creadas por un compañero de trabajo.</li>
+        <li>Buscar documentos con cierta palabra aunque no figure en el título.</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ CIERRE (06) — cita sobre imagen oscura ============ -->
+<section id="s05" class="relative py-28 mt-10 overflow-hidden observe-animate scroll-mt-20">
+  <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=2100&q=80" alt="" class="absolute inset-0 w-full h-full object-cover warm-image">
+  <div class="absolute inset-0 bg-warm-900/85"></div>
+  <div class="relative z-10 max-w-3xl mx-auto px-6 text-center">
+    <span class="text-wine-200 text-xs font-semibold uppercase tracking-[0.18em]">Sección 06 · Conclusiones</span>
+    <h2 class="font-serif text-cream-50 text-3xl sm:text-4xl font-semibold mt-4 mb-6">Simplicidad y consistencia, antes que el sistema perfecto</h2>
+    <p class="text-cream-100/85 leading-relaxed">El problema frecuente es la sobreoptimización: cambiar de sistema todo el tiempo, reorganizar carpetas sin parar, probar metodologías nuevas. Se pierde tiempo, aumenta la complejidad y baja la productividad. El mejor sistema no es el más sofisticado: es el que es <strong class="text-cream-50">simple</strong>, <strong class="text-cream-50">consistente</strong> y <strong class="text-cream-50">sostenible en el tiempo</strong>.</p>
+
+    <div class="grid sm:grid-cols-2 gap-3 mt-9 text-left">
+      <div class="bg-cream-50/10 border border-cream-100/20 rounded-2xl p-5 backdrop-blur-sm">
+        <h4 class="text-cream-50 font-semibold mb-2">🚀 Recomendaciones</h4>
+        <ul class="space-y-1 text-cream-100/80 text-sm list-disc list-inside">
+          <li>Elegir un sistema y mantenerlo al menos 6 meses.</li>
+          <li>Optimizar solo problemas reales.</li>
+          <li>Evitar reorganizar por perfeccionismo.</li>
+          <li>Priorizar claridad antes que complejidad.</li>
+        </ul>
+      </div>
+      <div class="bg-cream-50/10 border border-cream-100/20 rounded-2xl p-5 backdrop-blur-sm">
+        <h4 class="text-cream-50 font-semibold mb-2">📌 Un sistema funciona cuando…</h4>
+        <ul class="space-y-1 text-cream-100/80 text-sm list-disc list-inside">
+          <li>Permite encontrar información rápido.</li>
+          <li>Reduce la fricción mental.</li>
+          <li>Se mantiene fácil con el paso del tiempo.</li>
+        </ul>
+      </div>
+    </div>
+
+    <blockquote class="font-serif italic text-cream-50 text-xl sm:text-2xl mt-12 leading-snug">"La consistencia diaria genera más resultados que cualquier estructura teóricamente perfecta."</blockquote>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="bg-warm-900 text-cream-100/70 text-center py-12 px-6">
+  <p class="font-serif text-cream-50 text-lg">Modernización de la Gestión Administrativa</p>
+  <p class="text-sm mt-1">Dirección de Posgrado · Facultad de Derecho — Clase 1</p>
+  <p class="text-xs mt-3 text-cream-100/50">Google Drive: el centro de operaciones de la información digital · Material de clase</p>
+</footer>
+
+<!-- toast copiar -->
+<div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-warm-900 text-cream-50 text-sm px-5 py-2.5 rounded-full shadow-lg opacity-0 pointer-events-none transition-opacity z-[70]">Copiado ✓</div>
+
+<script>
+// progress bar
+const bar=document.getElementById('progress');
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  bar.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';
+});
+
+// menú mobile
+const hamb=document.getElementById('hamb'), mm=document.getElementById('mobileMenu');
+hamb.addEventListener('click',()=>mm.classList.toggle('open'));
+mm.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mm.classList.remove('open')));
+
+// animaciones de entrada
+const io=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('observed');io.unobserve(e.target);}});
+},{threshold:.12});
+document.querySelectorAll('.observe-animate').forEach(el=>io.observe(el));
+
+// copiar
+const toast=document.getElementById('toast');
+document.querySelectorAll('.copy-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const txt=document.getElementById(btn.dataset.target).innerText;
+    navigator.clipboard.writeText(txt).then(()=>{
+      toast.style.opacity='1';
+      btn.textContent='Copiado ✓';
+      setTimeout(()=>{toast.style.opacity='0';btn.textContent='Copiar';},1600);
+    });
+  });
+});
+</script>
+</body>
+</html>
